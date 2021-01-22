@@ -39,12 +39,46 @@ if ( !function_exists( 'add_action' ) ) {
 }
 
 class MonitorHeadline{
-    function __construct($string){
-        echo $string;
+    
+    function __construct()
+    {
+     
+        add_action('init',array($this,'custom_post_type'));
+    }
+    
+    function activate(){
 
+        $this->custom_post_type();
+        flush_rewrite_rules();
+    }
+
+    function deactivate(){
+
+        flush_rewrite_rules();
+    }
+
+    function uninstall(){
+
+    }
+
+    function custom_post_type(){
+        register_post_type('book',['public'=> true, 'label'=>'Books']);
     }
 
    
 }
 
-$monitorheadline= new MonitorHeadline('Monitor plugin initialised ');
+if (class_exists('MonitorHeadline')){
+    $monitorheadline= new MonitorHeadline();
+}
+
+
+//activation
+
+register_activation_hook( __FILE__, array($monitorheadline,'activate') );
+
+//deactivation
+
+register_deactivation_hook( __FILE__, array($monitorheadline,'deactivate') );
+
+//uninstall
