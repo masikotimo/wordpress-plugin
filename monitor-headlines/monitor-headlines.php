@@ -44,6 +44,7 @@ class MonitorHeadline{
     {
      
         add_action('init',array($this,'custom_post_type'));
+        $this->fetchHeadlines('https://www.monitor.co.ug/uganda');
     }
     
     function activate(){
@@ -70,22 +71,15 @@ class MonitorHeadline{
     function fetchHeadlines($url){
         $ch = curl_init($url);
         
-        $fp = fopen("Dailymonitor.txt", "w");
-        
-        curl_setopt($ch, CURLOPT_FILE, $fp);
-        curl_exec($ch);
-        if(curl_error($ch)) {
-            fwrite($fp, curl_error($ch));
-        }
-        curl_close($ch);
-        fclose($fp);
-        //getting contents from the file
-        $post_content= file_get_contents("Dailymonitor.txt");
-        
-        preg_match_all('/(<h3>\V|<h3>)<a href="(.*?)">(.*?)<\/a><\/h3>/', $post_content, $headlines);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+        curl_setopt($ch, CURLOPT_URL, $url); 
+
+        $output= curl_exec($ch);
+       
+        preg_match_all('/(<h3>\V|<h3>)<a href="(.*?)">(.*?)<\/a><\/h3>/', $output, $headlines);
     
         foreach ($headlines[0] as $headline => $value) {
-            print $value;
+            echo $value;
         }
     
         return $headlines[0];
